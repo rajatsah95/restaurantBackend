@@ -3,7 +3,7 @@
 
 # Folder Structure
 ----------------------
-restaurantBackend/
+<pre>restaurantBackend/
 │── src/
 │   ├── config/db.js
 │   ├── routes/searchRoutes.js
@@ -14,7 +14,7 @@ restaurantBackend/
 ├── README.md
 ├── package.json
 └── server.js
-
+</pre>
 
 ## Setup steps
 ## 1. clone repository in vs code by 'git clone https://github.com/rajatsah95/restaurantBackend.git'
