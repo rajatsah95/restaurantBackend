@@ -1,17 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const conn = require("../config/db");
+const pool = require("../config/db");
 
-router.get("/dishes", (req, res) => {
-    const { name, minPrice, maxPrice } = req.query;
+router.get("/dishes", async (req, res) => {
+  const { name, minPrice, maxPrice } = req.query;
 
-    if (!name || !minPrice || !maxPrice) {
-        return res.status(400).json({
-            error: "name, minPrice, maxPrice are required"
-        });
-    }
+  if (!name || !minPrice || !maxPrice) {
+    return res.status(400).json({
+      error: "name, minPrice, maxPrice are required",
+    });
+  }
 
-    const sql = `
+  try {
+    const [results] = await pool.query(
+      `
       SELECT 
         r.id AS restaurantId,
         r.name AS restaurantName,
@@ -26,16 +28,16 @@ router.get("/dishes", (req, res) => {
         AND m.price BETWEEN ? AND ?
       GROUP BY r.id, m.id
       ORDER BY orderCount DESC
-      LIMIT 10
-    `;
+      LIMIT 10;
+      `,
+      [`%${name}%`, minPrice, maxPrice]
+    );
 
-    conn.query(sql, [`%${name}%`, minPrice, maxPrice], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: "Server error" });
-        }
-        res.json({ restaurants: results });
-    });
+    res.json({ restaurants: results });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 module.exports = router;
